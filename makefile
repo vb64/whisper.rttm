@@ -19,11 +19,17 @@ PYLINT = $(PYTHON) -m pylint
 PYTEST = $(PTEST) --cov=$(SOURCE) --cov-report term:skip-covered
 PIP = $(PYTHON) -m pip install
 
+MP3 = \
+xxx.mp3 \
+
+SRT = $(addprefix build/,$(subst .mp3,.srt,$(MP3)))
 
 all: tests
 
-test:
-	$(PTEST) -s $(TESTS)/test/$(T)
+build/%.srt: build/%.mp3
+	$(PYTHON) $(SOURCE)/to_srt.py --whisper_batch 8 --torch_batch 4 $< $(basename $<).rttm $@
+
+srt: $(SRT)
 
 tests: flake8 pep257 lint
 	$(PYTEST) -m "not longrunning" --durations=5 $(TESTS)
@@ -46,9 +52,6 @@ flake8:
 lint:
 	$(PYLINT) $(TESTS)/test
 	$(PYLINT) $(SOURCE)
-
-srt:
-	$(PYTHON) $(SOURCE)/to_srt.py --whisper_batch 8 --torch_batch 4 fixtures/short.mp3 fixtures/short.rttm build/short.srt
 
 setup: setup_python setup_pip
 
