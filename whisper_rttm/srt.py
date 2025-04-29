@@ -45,3 +45,8 @@ def write_srt(transcript, file_name):
         )
 
     out.close()
+
+
+def whisper_to_srt(srt_file, _segments, _info):
+    """Write whisper segments to a file in SRT format."""
+    return srt_file

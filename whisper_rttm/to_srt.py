@@ -4,7 +4,6 @@ import sys
 import time
 
 import faster_whisper
-from ctc_forced_aligner import load_alignment_model
 
 sys.path.insert(1, '.')
 VERSION = '1.0'
@@ -16,14 +15,15 @@ PARSER.add_argument(
   help="Mp3 file for transcribe."
 )
 PARSER.add_argument(
-  "rttm_file",
-  help="Input Nemo rttm file."
-)
-PARSER.add_argument(
   "srt_file",
   help="Srt file for output."
 )
 
+PARSER.add_argument(
+  "--rttm",
+  default='',
+  help="Optional Nemo rttm file."
+)
 PARSER.add_argument(
   "--whisper_batch",
   type=int,
@@ -38,38 +38,47 @@ PARSER.add_argument(
 )
 
 
-def main(options):
+def main(options):  # pylint: disable=too-many-locals
     """Entry point."""
     print("Whisper transcribe tool v.{}. {}".format(VERSION, COPYRIGHTS))
     stime = time.time()
 
-    from whisper_rttm import Model, Device, MTYPES, TTYPES
+    from whisper_rttm import Model, Device, MTYPES
     from whisper_rttm.transcript import transcribe
+    from .srt import whisper_to_srt
 
-    alignment_model, alignment_tokenizer = load_alignment_model(
-      Device.Cpu,
-      dtype=TTYPES[Device.Cpu]
-    )
     whisper_model = faster_whisper.WhisperModel(
       Model.Large,
       device=Device.Cpu,
       compute_type=MTYPES[Device.Cpu]
     )
     whisper_pipeline = faster_whisper.BatchedInferencePipeline(whisper_model)
+    waveform = faster_whisper.decode_audio(options.mp3_file)
+    batch_size = options.whisper_batch
+    suppress_tokens = [-1]
+    lang = 'ru'
 
-    srt_file = transcribe(
-      options.mp3_file, options.rttm_file, options.srt_file,
-      whisper_pipeline,
-      whisper_model,
-      alignment_model,
-      alignment_tokenizer,
-      [-1],
-      options.whisper_batch,
-      options.torch_batch,
-      'ru'
-    )
+    if batch_size > 0:
+        segments, info = whisper_pipeline.transcribe(
+          waveform, lang, suppress_tokens=suppress_tokens,
+          batch_size=batch_size,
+        )
+    else:
+        segments, info = whisper_model.transcribe(
+          waveform, lang, suppress_tokens=suppress_tokens,
+          vad_filter=True,
+        )
+
+    if options.rttm_file:
+        srt_file = transcribe(
+          waveform, options.rttm_file, options.srt_file,
+          segments, info, options.torch_batch
+        )
+    else:
+        srt_file = whisper_to_srt(options.srt_file, segments, info)
 
     print(srt_file, "{} sec".format(int(time.time() - stime)))
+    return 0
 
 
 if __name__ == '__main__':  # pragma: no cover
