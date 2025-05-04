@@ -45,7 +45,7 @@ def main(options):  # pylint: disable=too-many-locals
 
     from whisper_rttm import Model, Device, MTYPES
     from whisper_rttm.transcript import transcribe
-    from .srt import whisper_to_srt
+    from whisper_rttm.srt import whisper_to_srt
 
     whisper_model = faster_whisper.WhisperModel(
       Model.Large,
@@ -69,9 +69,9 @@ def main(options):  # pylint: disable=too-many-locals
           vad_filter=True,
         )
 
-    if options.rttm_file:
+    if options.rttm:
         srt_file = transcribe(
-          waveform, options.rttm_file, options.srt_file,
+          waveform, options.rttm, options.srt_file,
           segments, info, options.torch_batch
         )
     else:
