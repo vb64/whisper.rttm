@@ -55,9 +55,11 @@ def whisper_to_srt(srt_file, segments, _info):
         # write srt lines
         print(i, file=out)
         print(
-          format_timestamp(segment.start * 1000, always_include_hours=True, decimal_marker=','),
+          format_timestamp(int(segment.start * 1000), always_include_hours=True, decimal_marker=','),
           "-->",
-          "{}".format(format_timestamp(segment.end * 1000, always_include_hours=True, decimal_marker=',')),
+          "{}".format(
+            format_timestamp(int(segment.end * 1000), always_include_hours=True, decimal_marker=',')
+          ),
           file=out
         )
         print(
