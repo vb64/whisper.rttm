@@ -27,7 +27,7 @@ SRT = $(addprefix build/,$(subst .mp3,.srt,$(MP3)))
 all: tests
 
 build/%.srt: build/%.mp3
-	$(PYTHON) $(SOURCE)/to_srt.py --whisper_batch 8 --torch_batch 4 $< $(basename $<).rttm $@
+	$(PYTHON) $(SOURCE)/to_srt.py --torch_batch 4 --rttm $(basename $<).rttm $< $@
 
 srt: $(SRT)
 

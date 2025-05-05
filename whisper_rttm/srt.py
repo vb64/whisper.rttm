@@ -45,3 +45,28 @@ def write_srt(transcript, file_name):
         )
 
     out.close()
+
+
+def whisper_to_srt(srt_file, segments, _info):
+    """Write whisper segments to a file in SRT format."""
+    out = open(srt_file, "w", encoding="utf-8")
+
+    for i, segment in enumerate(segments, start=1):
+        # write srt lines
+        print(i, file=out)
+        print(
+          format_timestamp(int(segment.start * 1000), always_include_hours=True, decimal_marker=','),
+          "-->",
+          "{}".format(
+            format_timestamp(int(segment.end * 1000), always_include_hours=True, decimal_marker=',')
+          ),
+          file=out
+        )
+        print(
+          "{}\n".format(segment.text.strip().replace('-->', '->')),
+          file=out
+        )
+
+    out.close()
+
+    return srt_file
