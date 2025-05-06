@@ -23,13 +23,6 @@ class TestToSrt(TestBase):
         assert main(options) == 0
 
         options = PARSER.parse_args([
-          "--whisper_batch", "2",
-          self.fixture('short.mp3'),
-          self.build('no_rttm_batch.srt'),
-        ])
-        assert main(options) == 0
-
-        options = PARSER.parse_args([
           self.fixture('short.mp3'),
           self.build('no_rttm.srt'),
         ])

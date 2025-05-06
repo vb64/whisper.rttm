@@ -6,7 +6,7 @@ import time
 import faster_whisper
 
 sys.path.insert(1, '.')
-VERSION = '1.0'
+VERSION = '1.1'
 COPYRIGHTS = 'Copyrights by Vitaly Bogomolov 2025'
 PARSER = argparse.ArgumentParser(description='Whisper transcribe tool.')
 
@@ -24,18 +24,11 @@ PARSER.add_argument(
   default='',
   help="Optional Nemo rttm file."
 )
-PARSER.add_argument(
-  "--whisper_batch",
-  type=int,
-  default=0,
-  help="Batch size for whisper batched inference. Default 0 (original whisper longform inference).",
-)
-PARSER.add_argument(
-  "--torch_batch",
-  type=int,
-  default=0,
-  help="Torch batch size. Default 0 (disabled).",
-)
+
+
+def map_speakers(_rttm_file, srt_file, _segments, _info):
+    """Combine Whisper segments and Nemo rttm."""
+    return srt_file
 
 
 def main(options):  # pylint: disable=too-many-locals
@@ -44,7 +37,6 @@ def main(options):  # pylint: disable=too-many-locals
     stime = time.time()
 
     from whisper_rttm import Model, Device, MTYPES
-    from whisper_rttm.transcript import transcribe
     from whisper_rttm.srt import whisper_to_srt
 
     whisper_model = faster_whisper.WhisperModel(
@@ -52,28 +44,15 @@ def main(options):  # pylint: disable=too-many-locals
       device=Device.Cpu,
       compute_type=MTYPES[Device.Cpu]
     )
-    whisper_pipeline = faster_whisper.BatchedInferencePipeline(whisper_model)
     waveform = faster_whisper.decode_audio(options.mp3_file)
-    batch_size = options.whisper_batch
-    suppress_tokens = [-1]
-    lang = 'ru'
 
-    if batch_size > 0:
-        segments, info = whisper_pipeline.transcribe(
-          waveform, lang, suppress_tokens=suppress_tokens,
-          batch_size=batch_size,
-        )
-    else:
-        segments, info = whisper_model.transcribe(
-          waveform, lang, suppress_tokens=suppress_tokens,
-          vad_filter=True,
-        )
+    segments, info = whisper_model.transcribe(
+      waveform, 'ru', suppress_tokens=[-1],
+      vad_filter=True,
+    )
 
     if options.rttm:
-        srt_file = transcribe(
-          waveform, options.rttm, options.srt_file,
-          segments, info, options.torch_batch
-        )
+        srt_file = map_speakers(options.rttm, options.srt_file, segments, info)
     else:
         srt_file = whisper_to_srt(options.srt_file, segments, info)
 
