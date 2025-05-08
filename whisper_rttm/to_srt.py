@@ -5,6 +5,10 @@ import time
 
 import faster_whisper
 
+from whisper_rttm import Model, Device, MTYPES
+from whisper_rttm.srt import whisper_to_srt
+from whisper_rttm.rttm import NemoRttm
+
 sys.path.insert(1, '.')
 VERSION = '1.1'
 COPYRIGHTS = 'Copyrights by Vitaly Bogomolov 2025'
@@ -26,8 +30,19 @@ PARSER.add_argument(
 )
 
 
-def map_speakers(_rttm_file, srt_file, _segments, _info):
+def map_speakers(rttm_file, srt_file, _segments, info):
     """Combine Whisper segments and Nemo rttm."""
+    # word_timestamps=False,
+    #  multilingual=False,
+    #  max_new_tokens=None,
+    #  hotwords=None
+    print("# mp3", int(info.duration * 1000), int(info.duration_after_vad * 1000))
+
+    rttm = NemoRttm.from_file(rttm_file, 1000)
+    first = rttm.rows[0]
+    last = rttm.rows[-1]
+    print("# rttm", last.start + last.length - first.start)
+
     return srt_file
 
 
@@ -35,9 +50,6 @@ def main(options):  # pylint: disable=too-many-locals
     """Entry point."""
     print("Whisper transcribe tool v.{}. {}".format(VERSION, COPYRIGHTS))
     stime = time.time()
-
-    from whisper_rttm import Model, Device, MTYPES
-    from whisper_rttm.srt import whisper_to_srt
 
     whisper_model = faster_whisper.WhisperModel(
       Model.Large,
