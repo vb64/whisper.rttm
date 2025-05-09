@@ -30,7 +30,7 @@ PARSER.add_argument(
 )
 
 
-def map_speakers(rttm_file, srt_file, _segments, info):
+def map_speakers(rttm_file, srt_file, segments, info):
     """Combine Whisper segments and Nemo rttm."""
     # word_timestamps=False,
     #  multilingual=False,
@@ -42,6 +42,14 @@ def map_speakers(rttm_file, srt_file, _segments, info):
     first = rttm.rows[0]
     last = rttm.rows[-1]
     print("# rttm", last.start + last.length - first.start)
+
+    first, last = None, None
+    for segment in segments:
+        last = segment
+        if first is None:
+            first = segment
+
+    print("# segment", int((last.end - first.start)  * 1000))
 
     return srt_file
 
