@@ -46,6 +46,7 @@ class NemoRttm:
         """Make empty file."""
         self.rows = []
         self.length_ms = 0
+        self.speaker_map = {}
 
     @classmethod
     def from_file(cls, file_name, length_ms):
@@ -60,6 +61,9 @@ class NemoRttm:
                     if row.length < 1000:
                         continue
                     first = False
+                    obj.speaker_map[0] = row.speaker
+                    obj.speaker_map[row.speaker] = 0
+
                 obj.rows.append(row)
 
         return obj
