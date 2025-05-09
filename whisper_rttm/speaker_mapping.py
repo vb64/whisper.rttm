@@ -171,10 +171,10 @@ def speaker_timestamps(rttm_file):
     with open(rttm_file, "r", encoding='utf-8') as f:
         lines = f.readlines()
         for line in lines:
-            line_list = line.split(" ")
-            s = int(float(line_list[5]) * 1000)
-            e = s + int(float(line_list[8]) * 1000)
-            speaker_ts.append([s, e, int(line_list[11].split("_")[-1])])
+            line_list = line.split()
+            s = int(float(line_list[3]) * 1000)
+            e = s + int(float(line_list[4]) * 1000)
+            speaker_ts.append([s, e, int(line_list[7].split("_")[-1])])
 
     return speaker_ts
 
