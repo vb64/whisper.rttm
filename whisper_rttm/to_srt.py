@@ -38,7 +38,7 @@ def map_speakers(rttm_file, srt_file, segments, info):
     #  hotwords=None
     print("# mp3", int(info.duration * 1000), int(info.duration_after_vad * 1000))
 
-    rttm = NemoRttm.from_file(rttm_file, 1000)
+    rttm = NemoRttm.from_file(rttm_file, int(info.duration * 1000))
     first = rttm.rows[0]
     last = rttm.rows[-1]
     print("# rttm", last.start + last.length - first.start)
@@ -49,7 +49,7 @@ def map_speakers(rttm_file, srt_file, segments, info):
         if first is None:
             first = segment
 
-    print("# segment", int((last.end - first.start)  * 1000))
+    print("# segment", int((last.end - first.start) * 1000))
 
     return srt_file
 

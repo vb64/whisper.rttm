@@ -52,9 +52,15 @@ class NemoRttm:
         """Load data from file."""
         obj = cls()
         obj.length_ms = length_ms
+        first = True
         with open(file_name, 'r', encoding=cls.encoding) as inp:
             for line in inp:
-                obj.rows.append(NemoRow.from_line(line))
+                row = NemoRow.from_line(line)
+                if first:
+                    if row.length < 1000:
+                        continue
+                    first = False
+                obj.rows.append(row)
 
         return obj
 
