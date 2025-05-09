@@ -10,7 +10,7 @@ from whisper_rttm.srt import whisper_to_srt
 from whisper_rttm.rttm import NemoRttm
 
 sys.path.insert(1, '.')
-VERSION = '1.1'
+VERSION = '2.0'
 COPYRIGHTS = 'Copyrights by Vitaly Bogomolov 2025'
 PARSER = argparse.ArgumentParser(description='Whisper transcribe tool.')
 
