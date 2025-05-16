@@ -43,7 +43,7 @@ PARSER.add_argument(
 )
 
 
-def main(options):  # pylint: disable=too-many-locals
+def main(options):
     """Entry point."""
     print("Whisper transcribe tool v.{}. {}".format(VERSION, COPYRIGHTS))
     stime = time.time()
