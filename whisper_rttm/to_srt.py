@@ -6,7 +6,7 @@ import time
 import faster_whisper
 
 sys.path.insert(1, '.')
-VERSION = '1.1'
+VERSION = '1.2'
 COPYRIGHTS = 'Copyrights by Vitaly Bogomolov 2025'
 PARSER = argparse.ArgumentParser(description='Whisper transcribe tool.')
 
@@ -23,6 +23,11 @@ PARSER.add_argument(
   "--rttm",
   default='',
   help="Optional Nemo rttm file."
+)
+PARSER.add_argument(
+  "--lang",
+  default='ru',
+  help="Audio language. Default is 'ru'"
 )
 PARSER.add_argument(
   "--whisper_batch",
@@ -54,18 +59,16 @@ def main(options):  # pylint: disable=too-many-locals
     )
     whisper_pipeline = faster_whisper.BatchedInferencePipeline(whisper_model)
     waveform = faster_whisper.decode_audio(options.mp3_file)
-    batch_size = options.whisper_batch
     suppress_tokens = [-1]
-    lang = 'ru'
 
-    if batch_size > 0:
+    if options.whisper_batch > 0:
         segments, info = whisper_pipeline.transcribe(
-          waveform, lang, suppress_tokens=suppress_tokens,
-          batch_size=batch_size,
+          waveform, options.lang, suppress_tokens=suppress_tokens,
+          batch_size=options.whisper_batch,
         )
     else:
         segments, info = whisper_model.transcribe(
-          waveform, lang, suppress_tokens=suppress_tokens,
+          waveform, options.lang, suppress_tokens=suppress_tokens,
           vad_filter=True,
         )
 
