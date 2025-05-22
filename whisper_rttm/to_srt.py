@@ -38,7 +38,7 @@ PARSER.add_argument(
 PARSER.add_argument(
   "--torch_batch",
   type=int,
-  default=0,
+  default=4,
   help="Torch batch size. 0 for disabled. Default 4.",
 )
 
