@@ -6,7 +6,7 @@ import time
 import faster_whisper
 
 sys.path.insert(1, '.')
-VERSION = '1.2'
+VERSION = '1.3'
 COPYRIGHTS = 'Copyrights by Vitaly Bogomolov 2025'
 PARSER = argparse.ArgumentParser(description='Whisper transcribe tool.')
 
@@ -32,14 +32,14 @@ PARSER.add_argument(
 PARSER.add_argument(
   "--whisper_batch",
   type=int,
-  default=0,
-  help="Batch size for whisper batched inference. Default 0 (original whisper longform inference).",
+  default=8,
+  help="Batch size for whisper batched inference. 0 for original whisper longform inference. Default 8.",
 )
 PARSER.add_argument(
   "--torch_batch",
   type=int,
   default=0,
-  help="Torch batch size. Default 0 (disabled).",
+  help="Torch batch size. 0 for disabled. Default 4.",
 )
 
 
