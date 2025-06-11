@@ -26,3 +26,8 @@ git clone https://github.com/vb64/whisper.rttm.git
 cd whisper.rttm
 make setup PYTHON_BIN=python3
 ```
+
+## Ссылки
+
+- [Адаптация языковой модели vosk](https://habr.com/ru/articles/735480/)
+- [Сравнение Vosk и Whisper](https://habr.com/ru/articles/814057/)
