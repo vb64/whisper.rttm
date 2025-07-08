@@ -31,6 +31,9 @@ build/%.srt: build/%.mp3
 
 srt: $(SRT)
 
+json:
+	$(PYTHON) $(SOURCE)/to_words.py fixtures/short.mp3 build/short.json
+
 tests: flake8 pep257 lint
 	$(PYTEST) -m "not longrunning" --durations=5 $(TESTS)
 

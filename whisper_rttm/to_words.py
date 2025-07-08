@@ -2,8 +2,11 @@
 import time
 import argparse
 import sys
+import json
 
 import faster_whisper
+
+sys.path.insert(1, '.')
 from whisper_rttm import Model, Device, MTYPES
 
 VERSION = '1.0'
@@ -19,17 +22,20 @@ PARSER.add_argument(
   help="Json file for output."
 )
 
-sys.path.insert(1, '.')
+
+def msec(sec):
+    """Return int milliseconds for numpy float seconds."""
+    return int(round(float(sec * 1000)))
 
 
 def whisper_to_json(segments, _total_msec):
     """Decode whisper segments to json."""
     data = []
     for segment in segments:
-        seg_data = [segment.start * 1000, (segment.end - segment.start) * 1000, segment.text.strip()]
+        seg_data = [msec(segment.start), msec(segment.end - segment.start), segment.text.strip()]
         words = []
         for word in segment.words:
-            words.append([word.start * 1000, (word.end - word.start) * 1000, word.word.strip()])
+            words.append([msec(word.start), msec(word.end - word.start), word.word.strip()])
         seg_data.append(words)
         data.append(seg_data)
 
@@ -56,7 +62,7 @@ def main(options):  # pylint: disable=too-many-locals
     duration = int(info.duration_after_vad * 1000)
     print("duration", duration, "msec")
     data = whisper_to_json(segments, duration)
-    print(data)
+    print(json.dumps(data, indent=4))
 
     print(options.out_file, "{} sec".format(int(time.time() - stime)))
     return 0
