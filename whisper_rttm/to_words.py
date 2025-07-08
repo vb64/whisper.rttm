@@ -4,7 +4,6 @@ import argparse
 import sys
 
 import faster_whisper
-from whisper_rttm.srt import whisper_to_srt
 from whisper_rttm import Model, Device, MTYPES
 
 VERSION = '1.0'
@@ -16,35 +15,25 @@ PARSER.add_argument(
   help="Audio file for transcribe."
 )
 PARSER.add_argument(
-  "srt_file",
+  "out_file",
   help="Json file for output."
 )
 
 sys.path.insert(1, '.')
 
 
-def map_speakers(_rttm_file, srt_file, segments, info):
-    """Combine Whisper segments and Nemo rttm."""
-    # word_timestamps=False,
-    #  multilingual=False,
-    #  max_new_tokens=None,
-    #  hotwords=None
-    print("# mp3", int(info.duration * 1000), int(info.duration_after_vad * 1000))
-
-    # rttm = NemoRttm.from_file(rttm_file, int(info.duration * 1000))
-    # first = rttm.rows[0]
-    # last = rttm.rows[-1]
-    # print("# rttm", last.start + last.length - first.start)
-
-    first, last = None, None
+def whisper_to_json(segments, _total_msec):
+    """Decode whisper segments to json."""
+    data = []
     for segment in segments:
-        last = segment
-        if first is None:
-            first = segment
+        seg_data = [segment.start * 1000, (segment.end - segment.start) * 1000, segment.text.strip()]
+        words = []
+        for word in segment.words:
+            words.append([word.start * 1000, (word.end - word.start) * 1000, word.word.strip()])
+        seg_data.append(words)
+        data.append(seg_data)
 
-    print("# segment", int((last.end - first.start) * 1000))
-
-    return srt_file
+    return data
 
 
 def main(options):  # pylint: disable=too-many-locals
@@ -62,11 +51,14 @@ def main(options):  # pylint: disable=too-many-locals
     segments, info = whisper_model.transcribe(
       waveform, 'ru', suppress_tokens=[-1],
       vad_filter=True,
+      word_timestamps=True
     )
+    duration = int(info.duration_after_vad * 1000)
+    print("duration", duration, "msec")
+    data = whisper_to_json(segments, duration)
+    print(data)
 
-    whisper_to_srt(options.srt_file, segments, info)
-
-    print(options.srt_file, "{} sec".format(int(time.time() - stime)))
+    print(options.out_file, "{} sec".format(int(time.time() - stime)))
     return 0
 
 

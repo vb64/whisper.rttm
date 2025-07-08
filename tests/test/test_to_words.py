@@ -1,6 +1,6 @@
 """Module to_words.py tests.
 
-make test T=test_to_srt.py
+make test T=test_to_words.py
 """
 import pytest
 import faster_whisper
@@ -22,9 +22,9 @@ class TestToWords(TestBase):
         ])
         assert main(options) == 0
 
-    def test_map_speakers(self):
+    def test_whisper_to_json(self):
         """Check map_speakers function."""
-        from whisper_rttm.to_words import map_speakers
+        from whisper_rttm.to_words import whisper_to_json
         from whisper_rttm import Model, Device, MTYPES
 
         whisper_model = faster_whisper.WhisperModel(
@@ -37,6 +37,17 @@ class TestToWords(TestBase):
           'ru',
           suppress_tokens=[-1],
           vad_filter=True,
+          word_timestamps=True
         )
+        #  multilingual=False,
+        #  max_new_tokens=None,
+        #  hotwords=None
+        assert int(info.duration * 1000) == 19592
+        assert int(info.duration_after_vad * 1000) == 11736
+        # rttm = NemoRttm.from_file(rttm_file, int(info.duration * 1000))
+        # first = rttm.rows[0]
+        # last = rttm.rows[-1]
+        # print("# rttm", last.start + last.length - first.start)
 
-        assert map_speakers(self.fixture('short.rttm'), self.build('short.srt'), segments, info)
+        data = whisper_to_json(segments, int(info.duration_after_vad * 1000))
+        assert len(data) == 5
