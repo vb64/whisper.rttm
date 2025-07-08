@@ -18,7 +18,7 @@ class TestToWords(TestBase):
 
         options = PARSER.parse_args([
           self.fixture('short.mp3'),
-          self.build('no_rttm.srt'),
+          self.build('short.json'),
         ])
         assert main(options) == 0
 

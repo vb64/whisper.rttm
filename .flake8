@@ -1,2 +1,5 @@
 [flake8]
 max_line_length = 120
+
+per-file-ignores =
+    whisper_rttm/to_words.py:E402

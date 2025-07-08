@@ -7,7 +7,7 @@ import json
 import faster_whisper
 
 sys.path.insert(1, '.')
-from whisper_rttm import Model, Device, MTYPES
+from whisper_rttm import Model, Device, MTYPES  # pylint: disable=wrong-import-position
 
 VERSION = '1.0'
 COPYRIGHTS = 'Copyrights by Vitaly Bogomolov 2025'
@@ -62,7 +62,8 @@ def main(options):  # pylint: disable=too-many-locals
     duration = int(info.duration_after_vad * 1000)
     print("duration", duration, "msec")
     data = whisper_to_json(segments, duration)
-    print(json.dumps(data, indent=4))
+    with open(options.out_file, "wt", encoding="utf8") as out:
+        out.write(json.dumps(data, indent=4, ensure_ascii=False).encode('utf8').decode())
 
     print(options.out_file, "{} sec".format(int(time.time() - stime)))
     return 0
